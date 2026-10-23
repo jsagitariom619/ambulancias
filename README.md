@@ -4,9 +4,9 @@ Plataforma de gestión y atención prehospitalaria.
 
 ## Estado
 
-**Prototipo inicial para verificar despliegue. No apto para uso clínico.**
+**Versión de desarrollo para validación visual y funcional local. No apta para uso clínico real.**
 
-La pantalla inicial muestra los módulos planificados, sin formularios clínicos ni datos reales.
+Incluye diez módulos de navegación, gestión local de pacientes, atención prehospitalaria por cuatro etapas, unidad, inventario básico, calendario, traslados y reportes agregados. Los datos clínicos permanecen en IndexedDB del dispositivo.
 
 ## Despliegue
 
@@ -15,10 +15,10 @@ Sitio estático: servir la raíz del repositorio con Vercel, Framework Preset: O
 ## Arquitectura prevista
 
 - PWA responsive para móvil, tablet y escritorio.
-- Datos clínicos locales, con cifrado, controles de acceso y respaldos por implementar y auditar.
+- Datos clínicos locales en IndexedDB. Cifrado, controles de acceso y respaldo/restauración verificables pendientes.
 - Administración central exclusiva para cuentas de empresas y activaciones, sin suscripciones mensuales.
 - No guardar datos clínicos en Supabase.
 
 ## Antes de uso clínico
 
-Implementar y validar autenticación, persistencia local segura, migraciones, respaldo/restauración, manejo offline, permisos, pruebas de pérdida de datos y flujos clínicos.
+Antes de uso clínico, implementar y validar autenticación, cifrado local, respaldo/restauración, auditoría, activaciones centrales, controles de permisos, ciclo offline y pruebas de pérdida/recuperación de datos. Revisar también el nivel de estructuración de medicamentos, procedimientos y registro ABCDE. Ver `docs/AUDITORIA_PREVIA.md`.

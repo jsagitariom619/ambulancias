@@ -1,13 +1,17 @@
 # Auditoría previa — MedSolution Ambulancia
 
-Estado: revisión estática inicial; NO apto para uso clínico real.
+Estado: auditoría inicial ampliada tras implementación de interfaz y flujos locales; NO apto para uso clínico real.
 Rama: `codex/ambulancia-integral`. Producción `main` permanece sin cambios.
 
 ## Inventario verificado
-- `index.html`: diseño responsive, menú lateral con pestañas Inicio, Pacientes, Emergencias, Reportes, Configuración. No hay pantallas operativas para Evaluación ABCDE, Procedimientos, Traslados, Ambulancias, Inventario o entrega hospitalaria.
-- `app.js`: IndexedDB `medsolution_ambulancia_piloto_v1` con dos almacenes `patients` y `emergencies`; CRUD básico, vínculos por UUID, resumen y CSV. No existe cifrado ni autenticación.
-- `sw.js`: shell offline y estrategia de red con caché; no valida consistencia de datos ni garantiza durabilidad.
-- `manifest.webmanifest`: manifiesto PWA sin iconos instalables completos.
+- `index.html`: tablero responsive inspirado en la referencia aprobada, navegación lateral con diez módulos, etapas de atención, formularios locales, indicadores y estados vacíos.
+- `app.js`: base IndexedDB `medsolution_ambulancia_piloto_v1`; conserva `patients` y `emergencies` y amplía de forma aditiva a versión 2 con `units`, `inventory` y `appointments`. No elimina, transforma ni siembra registros existentes.
+- Atención: datos de evaluación ABCDE, signos vitales, Glasgow, procedimientos, medicamentos, traslado y entrega se guardan en el registro de emergencia. Procedimientos, medicamentos y ABCDE se capturan como descripciones de texto, no como órdenes o catálogos clínicos estructurados.
+- Módulos locales: pacientes (crear/editar y consultar), emergencias/atenciones (crear por cuatro etapas y continuar), traslados (consulta desde emergencias), unidad (crear/editar), inventario (agregar/retirar), calendario (programar/cancelar) y resumen CSV agregado.
+- Inicio calcula conteos desde IndexedDB y fecha local del dispositivo. Los signos vitales, procedimientos, turnos y unidad se muestran desde los registros existentes; sin datos, usa estados vacíos.
+- `sw.js`: shell offline con cache versionada v3; sirve el HTML en navegación sin conexión. La persistencia offline clínica y el ciclo PWA no se han validado en dispositivos reales.
+- `manifest.webmanifest` e `icon.svg`: manifiesto con icono SVG; faltan pruebas de instalación en cada plataforma.
+- No hay autenticación real, Supabase, cifrado local, auditoría inmutable ni respaldo/restauración cifrada. La interfaz muestra una advertencia y no se declara apta para datos clínicos reales.
 
 ## Riesgos bloqueantes
 1. **Privacidad**: información en IndexedDB sin cifrado. No introducir datos personales reales.
@@ -37,5 +41,15 @@ Rama: `codex/ambulancia-integral`. Producción `main` permanece sin cambios.
 - Autenticación y activación central de empresa/dispositivo con permisos y RLS; datos clínicos locales cifrados.
 - Pruebas automatizadas y manuales en móvil, tablet, PC y offline, sin regresiones.
 
-## Pruebas realizadas
-Revisión estática de los cuatro archivos existentes y confirmación de la rama de desarrollo. **No se ejecutaron pruebas de navegador, seguridad, PostgreSQL ni restauración**. Ningún criterio de producción se considera aprobado.
+## Verificación automatizada de la implementación
+- `node --check app.js`, `node --check sw.js` y `git diff --check`: correctos.
+- Prueba automatizada con JSDOM y fake IndexedDB: semilla local preexistente conservada al abrir versión 2; comprobación de los cinco almacenes; navegación a los diez módulos; creación/edición de paciente; registro de unidad, elemento de inventario y turno; flujo Evaluación → Intervenciones → Traslado → Entrega; atención final cerrada y datos persistidos; cero errores JavaScript observados.
+- La prueba utiliza datos sintéticos únicamente en una base IndexedDB aislada del navegador del usuario. No se cargaron registros de ejemplo al código ni a producción.
+
+## Validación manual pendiente
+- No se obtuvieron capturas ni pruebas visuales en navegador real. Pendiente revisar computadora, tablet, Android y iPhone; menú contraído, cajón móvil, tamaños, accesibilidad y controles táctiles.
+- Pendiente validar Service Worker/PWA offline e instalación en navegadores/dispositivos reales.
+- Pendiente validar que la base real existente del usuario conserva todos sus registros con copia recuperable verificada antes de usar la versión en dicho dispositivo. La prueba automatizada solo comprobó una base de prueba aislada.
+- No se ejecutaron pruebas de PostgreSQL/RLS/Supabase, autenticación, cifrado, respaldo/restauración ni prueba de recuperación; estos subsistemas aún no están implementados.
+
+Los criterios clínicos y de producción siguen bloqueados. No borrar datos del sitio ni migrar a uso clínico real con esta versión.
