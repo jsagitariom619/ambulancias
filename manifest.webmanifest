@@ -1,0 +1,10 @@
+{
+  "name": "MedSolution — Ambulancia",
+  "short_name": "Ambulancia",
+  "start_url": "/",
+  "scope": "/",
+  "display": "standalone",
+  "background_color": "#f3f7f5",
+  "theme_color": "#125748",
+  "lang": "es"
+}
