@@ -53,3 +53,15 @@ Rama: `codex/ambulancia-integral`. Producción `main` permanece sin cambios.
 - No se ejecutaron pruebas de PostgreSQL/RLS/Supabase, autenticación, cifrado, respaldo/restauración ni prueba de recuperación; estos subsistemas aún no están implementados.
 
 Los criterios clínicos y de producción siguen bloqueados. No borrar datos del sitio ni migrar a uso clínico real con esta versión.
+
+## Respaldo cifrado local (implementado para validación)
+- Exportación completa y de solo lectura de los cinco almacenes actuales, incluidos valores de claves e identificadores relacionados; no se exporta a texto claro.
+- Formato JSON versionado con PBKDF2-SHA-256 (310 000 iteraciones), sal aleatoria de 128 bits, AES-256-GCM, IV aleatorio de 96 bits y hash SHA-256 del contenido autenticado. Se limita la importación a 100 MB y se valida base, versión, almacenes, key paths y claves únicas antes de escribir.
+- Restauración en una transacción IndexedDB atómica, sin reemplazos: agrega claves ausentes, omite copias idénticas y aborta todo el lote ante cualquier colisión con datos distintos. No cambia el esquema ni elimina registros.
+- Evidencia automatizada, con IndexedDB aislada y datos sintéticos: exportó todos los almacenes, no detectó texto clínico en claro, restauró identificadores y relación paciente-atención, rechazó contraseña incorrecta y ciphertext alterado, y confirmó abortado atómico en colisión sin cambios parciales.
+- La base activa permanece sin cifrar. El respaldo cifrado no aporta cifrado en reposo para IndexedDB, autenticación, permisos, auditoría ni recuperación de contraseña. El usuario debe guardar la contraseña de respaldo por separado.
+
+## Comparación visual de referencia y estado de prueba
+- Se revisaron los diez destinos de navegación y la composición Inicio implementados en la rama contra la captura aprobada: navegación lateral, cabecera, bienvenida, botón rojo de emergencia, accesos rápidos, indicadores, unidad, listas recientes, signos vitales y turnos/procedimientos. Se mantiene la jerarquía y paleta existentes; no se hicieron ajustes visuales sin comparación en navegador real.
+- Los módulos de atención siguen el flujo de cuatro etapas. La revisión visual en computadora y teléfono y las capturas quedan pendientes de inspección de navegador real.
+- `sw.js` avanzó de caché shell v3 a v4 para que instalaciones existentes soliciten los archivos actualizados.
